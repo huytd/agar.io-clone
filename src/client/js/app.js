@@ -46,8 +46,12 @@ function validNick() {
     return regex.exec(playerNameInput.value) !== null;
 }
 
-window.onload = function() {
+function generateUserId (){
+	var res = Math.random () * 1000 + 1;
+	return res;
+}
 
+window.onload = function() {
     var btn = document.getElementById('startButton'),
         btnS = document.getElementById('spectateButton'),
         nickErrorText = document.querySelector('#startMenu .input-error');
@@ -57,7 +61,6 @@ window.onload = function() {
     };
 
     btn.onclick = function () {
-
         // Checks if the nick is valid.
         if (validNick()) {
             nickErrorText.style.opacity = 0;

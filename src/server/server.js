@@ -6,7 +6,19 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var SAT = require('sat');
-var sql = require ("mysql");
+var pg = require ('pg');
+var localStorage = require ('node-localstorage');
+
+//Establish database connection
+pg.defaults.ssl = true;
+var client = new pg.Client(process.env.DATABASE_URL);
+client.connect (function (err){
+ if(err){
+ 	console.log (err);
+     console.log ('Error connecting to pg');
+ }
+ console.log ('connected to pg');
+});
 
 // Import game settings.
 var c = require('../../config.json');
@@ -16,9 +28,6 @@ var util = require('./lib/util');
 
 // Import quadtree.
 var quadtree = require('simple-quadtree');
-
-//call sqlinfo
-var s = c.sqlinfo;
 
 var tree = quadtree(0, 0, c.gameWidth, c.gameHeight);
 
@@ -237,7 +246,6 @@ function balanceMass() {
 
 io.on('connection', function (socket) {
     console.log('A user connected!', socket.handshake.query.type);
-
     var type = socket.handshake.query.type;
     var radius = util.massToRadius(c.defaultPlayerMass);
     var position = c.newPlayerInitialPosition == 'farthest' ? util.uniformPosition(users, radius) : util.randomPosition(radius);
@@ -364,7 +372,8 @@ io.on('connection', function (socket) {
             // TODO: Actually log incorrect passwords.
               console.log('[ADMIN] ' + currentPlayer.name + ' attempted to log in with incorrect password.');
               socket.emit('serverMSG', 'Password incorrect, attempt logged.');
-             pool.query('INSERT INTO logging SET name=' + currentPlayer.name + ', reason="Invalid login attempt as admin"');
+              
+              client.query('INSERT INTO logging(name,reason) VALUES(' + currentPlayer.name + ', "invalid login attempt as admin)');
         }
     });
 

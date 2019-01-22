@@ -34,6 +34,11 @@
     "mergeTimer": 15,
     "sqlinfo":{
       "connectionLimit": 100,
+      "host": "localhost",
+      "user": "username",
+      "password": "password",
+      "database": "db",
+      "port": 5432,
       "host": "DEFAULT",
       "user": "root",
       "password": "DEFAULT",
